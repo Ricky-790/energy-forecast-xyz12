@@ -152,7 +152,8 @@ npm run dev
 
 App: http://localhost:5173
 
-The Vite dev server proxies `/api` to `http://127.0.0.1:8000`.
+The API base URL comes from `frontend/.env` (`VITE_API_BASE_URL`). When the
+variable is missing, the app falls back to `http://localhost:8000`.
 
 ## Run with Docker
 
@@ -267,16 +268,39 @@ Manual acceptance checks used against January 2026 data:
 
 ## Deployment notes
 
-The repository includes Dockerfiles and Docker Compose. It has not been deployed
-to a public host.
+The repository includes Dockerfiles and Docker Compose.
 
 For Heroku, Render, Fly.io, or another container host, attach a persistent disk
 and point `DATABASE_PATH` at it. SQLite needs durable storage to keep the cache
-across restarts. Vercel's filesystem is ephemeral, so the SQLite cache would be
-lost between invocations unless an external database is used.
+across restarts.
 
-If the frontend is served from a separate origin instead of the bundled nginx
-proxy, set `VITE_API_BASE_URL` at build time to the backend URL.
+If the frontend is served from a separate origin, set `VITE_API_BASE_URL` (in
+`frontend/.env` or the deployment environment) to the backend URL before
+building. Without it the app calls `http://localhost:8000`.
+
+### Vercel
+
+Deploy the backend as its own project with **Root Directory** set to `backend`.
+The FastAPI entrypoint is `main.py`, and dependencies come from
+`pyproject.toml`/`uv.lock`.
+
+- `src/backend` is declared as the package in `pyproject.toml`
+  (`module-root = "src"`, `module-name = "backend"`). `main.py` also adds that
+  `src` directory to `sys.path`, because Vercel only puts the project root and
+  its vendor directory on the import path, not a `src` layout.
+- On Vercel the default `DATABASE_PATH` is `/tmp/wind.db`, because the
+  deployment filesystem is read-only. `VERCEL=1` is set by the platform, so no
+  configuration is required. The cache is ephemeral and per instance, so a cold
+  start fetches the range again.
+- Set `CORS_ORIGINS` to the frontend origin, for example
+  `https://your-frontend.vercel.app`. The defaults only cover localhost.
+- Set `VITE_API_BASE_URL` in the frontend project to the backend URL (for
+  example `https://your-backend.vercel.app`) and redeploy the frontend after
+  changing it.
+- The first request for a month-long range calls Elexon many times. If the
+  platform times out, use a smaller range or raise the function duration in the
+  Vercel project settings.
+
 
 ## AI tools
 
