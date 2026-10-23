@@ -1,0 +1,32 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      ELEXON_API_BASE_URL: ${ELEXON_API_BASE_URL:-https://data.elexon.co.uk/bmrs/api/v1/datasets}
+      DATABASE_PATH: /app/data/wind.db
+      CORS_ORIGINS: http://localhost:3000
+    volumes:
+      - wind-data:/app/data
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5)"
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 5s
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+
+volumes:
+  wind-data:
