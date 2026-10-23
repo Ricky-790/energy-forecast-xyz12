@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 load_dotenv(BACKEND_DIR / ".env")
 
-DATABASE_PATH = Path(os.getenv("DATABASE_PATH", str(BACKEND_DIR / "data" / "wind.db")))
+DATABASE_DIR = Path("/tmp") if os.getenv("VERCEL") else BACKEND_DIR / "data"
+DATABASE_PATH = Path(os.getenv("DATABASE_PATH", str(DATABASE_DIR / "wind.db")))
 if not DATABASE_PATH.is_absolute():
     DATABASE_PATH = BACKEND_DIR / DATABASE_PATH
 

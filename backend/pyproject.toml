@@ -3,9 +3,6 @@ name = "backend"
 version = "0.1.0"
 description = "FastAPI backend for the wind forecast decision support app"
 readme = "README.md"
-authors = [
-    { name = "Ricky-790", email = "www.rickyjordan@gmail.com" }
-]
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.161.1",
@@ -16,10 +13,13 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-    "pytest>=8.3.0",
-]
+dev = ["pytest>=8.3.0"]
 
 [build-system]
 requires = ["uv_build>=0.12.8,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = "src"
+module-name = "backend"
+

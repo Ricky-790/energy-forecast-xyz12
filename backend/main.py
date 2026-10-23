@@ -1,10 +1,14 @@
+import sys
 import time
 from datetime import datetime
+from pathlib import Path
 from typing import Literal
 
 from fastapi import Depends, FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from backend.analysis import build_accuracy, compute_tolerance, select_forecasts
 from backend.config import (
