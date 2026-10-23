@@ -70,3 +70,8 @@ so its SQLite cache is ephemeral and refills on demand.
 
 To run both locally with Docker, use `docker compose up --build`
 (app on http://localhost:3000).
+
+## AI usage
+
+- AI wrote the db operations and schemas, the frontend: React screens, charts, tables, theme, and styling.
+- All features were run against live January 2026 Elexon data before acceptance.
